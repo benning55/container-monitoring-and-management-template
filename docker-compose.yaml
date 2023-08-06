@@ -1,6 +1,8 @@
 version: "3.8"
 
 volumes:
+  portainer_data:
+    driver: local
   prometheus-data:
     driver: local
   grafana-data:
@@ -10,8 +12,6 @@ services:
   prometheus:
     image: prom/prometheus:latest
     container_name: prometheus
-    ports:
-      - 9090:9090
     volumes:
       - ./config:/etc/prometheus
       - prometheus-data:/prometheus
@@ -22,8 +22,6 @@ services:
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:v0.47.0
     container_name: cadvisor
-    ports:
-      - 8080:8080
     volumes:
       - /:/rootfs:ro
       - /var/run:/var/run:ro
@@ -52,3 +50,13 @@ services:
     volumes:
       - grafana-data:/var/lib/grafana
     restart: unless-stopped
+  portainer:
+    container_name: portainer
+    image: portainer/portainer-ce:latest
+    ports:
+      - "8000:8000"
+      - "9443:9443"
+    volumes:
+      - "portainer_data:/data"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    restart: always
